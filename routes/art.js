@@ -1,9 +1,13 @@
 import express from "express";
-import PixelSchema from "../models/pixels.js";
+import PixelSchema,{ validatePixel } from "../models/pixels.js";
 
 const router = express.Router();
 
-router.post("/",(req,res)=>{
+router.post("/",async (req,res)=>{
+    const error = await validatePixel(req.body);
+    if(error.message){
+        res.status(400).send(error.message);
+    }
     let pixelArt = new PixelSchema({
         imageTitle:req.body.imageTitle,
         imageURL:req.body.imageURL,
@@ -17,7 +21,7 @@ router.post("/",(req,res)=>{
     pixelArt.save().then((pixel)=>{
         res.send(pixel);
     }).catch((err)=>{
-        res.status(500).send("Art not uploaded");
+        res.status(500);
     })
 })
 
